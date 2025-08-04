@@ -95,15 +95,24 @@ st.subheader("Pokémon Comparisons")
 main_pokemon_name = selected_name.strip()
 
 # Choose a comparison metric
-comparison_metric = st.selectbox(
+metric_options = {
+    "Height (m)": "height_m",
+    "Weight (kg)": "weight_kg",
+    "HP": "hp",
+    "Attack (ATK)": "attack"
+}
+selected_display = st.selectbox(
     "Select metric to compare:",
-    ["height_m", "weight_kg", "hp", "attack"]
+    list(metric_options.keys())
 )
+
+# Get the actual column name
+selected_column = metric_options[selected_display]
 
 # Get a random selection of other Pokémon (excluding the selected one)
 num_selection = 5
 randomly_selected_df = df[df['name'] != main_pokemon_name].dropna(
-    subset=[comparison_metric]
+    subset=[selected_display]
 ).sample(n=num_selection, random_state=42)
 
 # Convert selected_row to DataFrame
@@ -124,24 +133,24 @@ suffix = {
     "weight_kg": "kg",
     "hp": " HP",
     "attack": " ATK"
-}[comparison_metric]
+}[selected_column]
 
 combined_df['metric_text'] = (
-    combined_df[comparison_metric].astype(str) + suffix
+    combined_df[selected_column].astype(str) + suffix
 )
 
 # Plot the graph
 fig = px.bar(
     combined_df,
-    x=comparison_metric,
+    x=selected_column,
     y='name',
     title=(
         f"Comparison of {main_pokemon_name} to Other Pokémon by "
-        f"{comparison_metric.capitalize()}"
+        f"{selected_display}"
     ),
     labels={
         'name': 'Pokémon Name',
-        comparison_metric: comparison_metric.capitalize()
+        selected_column: selected_display
     },
     text='metric_text',
     orientation='h',
