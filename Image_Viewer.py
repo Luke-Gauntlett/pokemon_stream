@@ -8,7 +8,7 @@ def get_pokemon_image_url(index):
 
 st.title("Pokémon Image")
 
-index = st.number_input("Enter Pokémon Index Number", min_value=1, max_value=1025, value=1)
+index = st.number_input("Enter Pokémon Index Number", min_value=1, max_value=898, value=1)
 
 img_url = get_pokemon_image_url(index)
 
