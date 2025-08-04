@@ -205,68 +205,72 @@ compare_pokemon = st.multiselect(
     df["label"]
 )
 
-# Always include the currently selected Pokémon from the top
-current_pokemon = st.session_state.current_pokemon
-if current_pokemon not in compare_pokemon:
-    compare_pokemon = [current_pokemon] + compare_pokemon
+# Only proceed if at least ONE Pokémon is manually selected
+if compare_pokemon:
+    # Always include the currently selected Pokémon from the top
+    current_pokemon = st.session_state.current_pokemon
+    if current_pokemon not in compare_pokemon:
+        compare_pokemon = [current_pokemon] + compare_pokemon
 
-# Checkboxes for metrics
-metrics = ["height_m", "weight_kg", "hp", "attack"]
-metric_display_names = {
-    "height_m": "Height (m)",
-    "weight_kg": "Weight (kg)",
-    "hp": "HP",
-    "attack": "Attack"
-}
+    # Checkboxes for metrics
+    metrics = ["height_m", "weight_kg", "hp", "attack"]
+    metric_display_names = {
+        "height_m": "Height (m)",
+        "weight_kg": "Weight (kg)",
+        "hp": "HP",
+        "attack": "Attack"
+    }
 
-# Show checkboxes
-selected_metrics = []
-cols = st.columns(4)  # One checkbox per metric
-for i, metric in enumerate(metrics):
-    if cols[i].checkbox(metric_display_names[metric], value=(metric in ["hp", "attack"])):
-        selected_metrics.append(metric)
+    # Show checkboxes
+    selected_metrics = []
+    cols = st.columns(4)  # One checkbox per metric
+    for i, metric in enumerate(metrics):
+        if cols[i].checkbox(metric_display_names[metric], value=(metric in ["hp", "attack"])):
+            selected_metrics.append(metric)
 
-# --- Ensure variables are defined before plotting ---
-if compare_pokemon and selected_metrics:
-    compare_df = df[df["label"].isin(compare_pokemon)][["label"] + selected_metrics]
+    # --- Plot graphs if metrics are selected ---
+    if selected_metrics:
+        compare_df = df[df["label"].isin(compare_pokemon)][["label"] + selected_metrics]
 
-    # Ensure the current Pokémon always appears first
-    compare_df = compare_df.set_index("label").loc[[current_pokemon] + [p for p in compare_pokemon if p != current_pokemon]].reset_index()
+        # Ensure the current Pokémon always appears first
+        compare_df = compare_df.set_index("label").loc[[current_pokemon] + [p for p in compare_pokemon if p != current_pokemon]].reset_index()
 
-    # Assign each Pokémon a unique color
-    import matplotlib.cm as cm
-    colors_map = cm.get_cmap("tab20", len(compare_df))  # 20 distinct colors
-    pokemon_colors = {label: colors_map(i) for i, label in enumerate(compare_df["label"])}
+        # Assign each Pokémon a unique color
+        import matplotlib.cm as cm
+        colors_map = cm.get_cmap("tab20", len(compare_df))  # 20 distinct colors
+        pokemon_colors = {label: colors_map(i) for i, label in enumerate(compare_df["label"])}
 
-    # Create a separate graph for each selected metric
-    for metric in selected_metrics:
-        fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
+        # Create a separate graph for each selected metric
+        for metric in selected_metrics:
+            fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
 
-        # --- Dark mode styling ---
-        fig.patch.set_facecolor("#000000")
-        ax.set_facecolor("#000000")
-        ax.tick_params(colors="white")
-        ax.xaxis.label.set_color("white")
-        ax.yaxis.label.set_color("white")
-        ax.title.set_color("white")
+            # --- Dark mode styling ---
+            fig.patch.set_facecolor("#000000")
+            ax.set_facecolor("#000000")
+            ax.tick_params(colors="white")
+            ax.xaxis.label.set_color("white")
+            ax.yaxis.label.set_color("white")
+            ax.title.set_color("white")
 
-        # Remove borders
-        for spine in ax.spines.values():
-            spine.set_visible(False)
+            # Remove borders
+            for spine in ax.spines.values():
+                spine.set_visible(False)
 
-        # Plot bars (horizontal)
-        ax.barh(
-            compare_df["label"],
-            compare_df[metric],
-            color=[pokemon_colors[label] for label in compare_df["label"]]
-        )
+            # Plot bars (horizontal)
+            ax.barh(
+                compare_df["label"],
+                compare_df[metric],
+                color=[pokemon_colors[label] for label in compare_df["label"]]
+            )
 
-        # Format axis
-        ax.set_yticklabels(compare_df["label"], color="white", fontsize=10)
-        ax.invert_yaxis()
-        ax.set_xlabel(metric_display_names[metric])
-        ax.set_title(f"{metric_display_names[metric]} Comparison")
-        ax.grid(False)
+            # Format axis
+            ax.set_yticklabels(compare_df["label"], color="white", fontsize=10)
+            ax.invert_yaxis()
+            ax.set_xlabel(metric_display_names[metric])
+            ax.set_title(f"{metric_display_names[metric]} Comparison")
+            ax.grid(False)
 
-        # Show each chart
-        st.pyplot(fig)
+            # Show each chart
+            st.pyplot(fig)
+else:
+    st.info("Select at least one Pokémon to compare.")
