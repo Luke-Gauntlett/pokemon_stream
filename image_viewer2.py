@@ -16,11 +16,6 @@ df['new_pokedex'] = df.apply(
 
 df['Pokemon'] = df.apply(lambda row: f"{row['pokedex_number']:03d} - {row['name']}", axis=1)
 
-def get_pokemon_image_url(index):
-    # Format index as a 3-digit string (e.g., 001, 025, 150)
-    index_str = str(index).zfill(3)
-    return f"https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/{index_str}.png"
-
 st.title("Pokémon Image")
 
 selected = st.selectbox("Choose Pokémon", df['Pokemon'])
@@ -29,5 +24,5 @@ image_index = df.loc[df['Pokemon'] == selected, 'new_pokedex'].values[0]
 
 img_url = f"https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/{image_index}.png"
 
-st.image(img_url, caption=f"{selected}", use_column_width=True)
+st.image(img_url, caption=f"{selected}", use_container_width=True)
 
