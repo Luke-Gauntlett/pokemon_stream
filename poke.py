@@ -267,6 +267,7 @@ if compare_pokemon:
             )
 
             # Add labels inside bars
+            # Add labels dynamically inside/outside bars with smaller text
             for bar, value in zip(bars, compare_df[metric]):
                 if value > max_value * 0.15:  # if bar is long enough
                     # Place label inside bar
@@ -277,7 +278,7 @@ if compare_pokemon:
                         va="center",
                         ha="right",
                         color="white",
-                        fontsize=10,
+                        fontsize=8,        # smaller font size
                         fontweight="bold"
                     )
                 else:
@@ -289,9 +290,10 @@ if compare_pokemon:
                         va="center",
                         ha="left",
                         color="white",
-                        fontsize=10,
+                        fontsize=8,        # smaller font size
                         fontweight="bold"
                     )
+
 
             # Format axis
             ax.set_xlim(0, max_value)  # Uniform scale for all graphs
