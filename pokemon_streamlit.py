@@ -98,7 +98,7 @@ main_pokemon_name = selected_name.strip()
 metric_options = {
     "Height (m)": "height_m",
     "Weight (kg)": "weight_kg",
-    "HP": "hp",
+    "Hit Points (HP)": "hp",
     "Attack (ATK)": "attack"
 }
 selected_display = st.selectbox(
@@ -112,7 +112,7 @@ selected_column = metric_options[selected_display]
 # Get a random selection of other Pokémon (excluding the selected one)
 num_selection = 5
 randomly_selected_df = df[df['name'] != main_pokemon_name].dropna(
-    subset=[selected_display]
+    subset=[selected_column]
 ).sample(n=num_selection, random_state=42)
 
 # Convert selected_row to DataFrame
