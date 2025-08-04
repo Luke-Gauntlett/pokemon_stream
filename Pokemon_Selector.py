@@ -20,4 +20,12 @@ st.title("Pokémon Image")
 selected = st.selectbox("Choose the name of your Pokémon", df['Pokemon'])
 name = selected.split(" - ")[1]
 user_result = df.loc[df['name'] == name,['name','height_m','weight_kg','type_1','type_2','ability_1','ability_2','ability_hidden']]
+
+select_columns = st.multiselect(
+    "What Attributes Would you like to see:",
+    options = df.columns.tolist(),
+    default=['name','height_m','weight_kg','type_1','type_2','ability_1','ability_2','ability_hidden']
+)
+user_result = df.loc[df['name'] == name, select_columns]
+
 st.dataframe(user_result)
