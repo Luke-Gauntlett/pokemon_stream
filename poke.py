@@ -235,9 +235,22 @@ if compare_pokemon and selected_metrics:
 
     # Create horizontal grouped bar chart
     fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
+
+    # --- Dark mode styling ---
+    fig.patch.set_facecolor("#000000")     # Entire figure background
+    ax.set_facecolor("#000000")            # Plot area background
+    ax.tick_params(colors="white")         # Tick color
+    ax.xaxis.label.set_color("white")      # X-axis label
+    ax.yaxis.label.set_color("white")      # Y-axis label
+    ax.title.set_color("white")            # Title color
+
+    # Remove borders/spines
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    # Plot bars
     y = range(len(compare_df))
     bar_height = 0.8 / len(selected_metrics)  # distribute bars evenly
-
     for i, metric in enumerate(selected_metrics):
         ax.barh(
             [p + i * bar_height for p in y],
@@ -246,11 +259,12 @@ if compare_pokemon and selected_metrics:
             label=metric_display_names[metric]
         )
 
+    # Set labels and formatting
     ax.set_yticks([p + bar_height * (len(selected_metrics) / 2) for p in y])
-    ax.set_yticklabels(compare_df["label"])
+    ax.set_yticklabels(compare_df["label"], color="white")
     ax.invert_yaxis()  # Highest value at top
     ax.set_xlabel("Value")
     ax.set_title("Pokémon Comparison")
-    ax.legend()
+    ax.legend(facecolor="#000000", edgecolor="none", labelcolor="white")
 
     st.pyplot(fig)
