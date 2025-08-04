@@ -22,7 +22,7 @@ Welcome to **Find Your Pokémon**, a Streamlit-powered app that lets you compare
 git clone https://github.com/Luke-Gauntlett/pokemon_stream.git
 cd pokemon_stream
 ```
-2. **Set up virtual environment**
+2. **Set up virtual environment**:
 ```bash
 python3 -m venv .venv
 ```
@@ -34,11 +34,11 @@ source .venv/Scripts/activate
 ```bash
 source .venv/bin/activate
 ```
-4. **Install the dependencies**:
+3. **Install the dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
-5. **Run the Streamlit app**:
+4. **Run the Streamlit app**:
 ```bash
 streamlit run pokemon_streamlit.py
 ```
