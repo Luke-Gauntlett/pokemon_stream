@@ -156,34 +156,34 @@ st.markdown("---")
 # Map against_ columns to type names
 type_map = {col.replace("against_", "").capitalize(): val for col, val in pokemon_info.items() if col.startswith("against_")}
 
-# Strong = damage 2.0, Weak = damage < 1.0
-strong_types = [t for t, v in type_map.items() if v >= 2.0]
-weak_types = [t for t, v in type_map.items() if v < 1.0]
+# Strong = damage > 2.0, Weak = damage < 1.0
+strong_types = [t for t, v in type_map.items() if v >= 2]
+weak_types = [t for t, v in type_map.items() if v < 1]
 
 def render_badges(types):
     badges = ""
-    for t in types:
+    for type in types:
         color = TYPE_COLORS.get(t, "#999999")
-        badges += f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{t}</span>'
+        badges += f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{type}</span>'
     return badges if badges else "<i>None</i>"
 
-# Strong Against
+# Strong Against title
 st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
         <h3 style='margin-bottom:10px;'>Strong Against</h3>
-        {render_badges(strong_types)}
+        {render_badges(weak_types)}
     </div>
     """,
     unsafe_allow_html=True
 )
 
-# Weak Against
+# Weak Against title
 st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
         <h3 style='margin-bottom:10px;'>Weak Against</h3>
-        {render_badges(weak_types)}
+        {render_badges(strong_types)}
     </div>
     """,
     unsafe_allow_html=True
