@@ -74,6 +74,10 @@ user_result = df.loc[df['Pokemon'] == selected_label, select_columns]
 st.subheader("Pokémon Info")
 st.dataframe(user_result)
 
+# Divider
+st.markdown("---")
+st.subheader("Pokémon Stats")
+
 # Display stats chart
 stats_cols = ["hp", "attack", "defense", "sp_attack", "sp_defense", "speed"]
 pokemon_stats = selected_row[stats_cols]
