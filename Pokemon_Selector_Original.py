@@ -7,8 +7,7 @@ check2 = False
 
 df = pd.read_csv("pokemon.csv")
 
-
-user_number = st.text_input("Input the Name of your pokemon")
+user_number = st.text_input("Please enter a number between 1 and 898")
 print(f"User input is: {user_number}" )
 if user_number.isnumeric():
     check1 = True
@@ -20,10 +19,14 @@ if user_number.isnumeric():
 else:
     st.write("That was not a number please try again!")
 
-if user_number in df['name'].values:
-    st.write("Here is the information about your pokemon:")
-    user_result = df.loc[df['name'] == user_number,['name','height_m','weight_kg','type_1','type_2','ability_1','ability_2','ability_hidden']]
-    st.dataframe(user_result)
+  
+if check1 == True and check2 == True:
+    user_result = df.loc[df['pokedex_number'] == int(user_number),['name','height_m','weight_kg','type_1','type_2','ability_1','ability_2','ability_hidden']]
 
-else:
-    st.write("Please Enter a valid name")
+    select_columns = st.multiselect(
+        "What Attributes Would you like to see:",
+        options = df.columns.tolist(),
+        default=['name','height_m','weight_kg','type_1','type_2','ability_1','ability_2','ability_hidden']
+    )
+    user_result = df.loc[df['pokedex_number'] == int(user_number) , select_columns]
+    st.dataframe(user_result)
