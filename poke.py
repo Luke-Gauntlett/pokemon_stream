@@ -228,58 +228,45 @@ for i, metric in enumerate(metrics):
 
 # --- Ensure variables are defined before plotting ---
 if compare_pokemon and selected_metrics:
-    compare_df = df[df["label"].isin(compare_pokemon)][["label", "type_1"] + selected_metrics]
+    compare_df = df[df["label"].isin(compare_pokemon)][["label"] + selected_metrics]
 
     # Ensure the current Pokémon always appears first
     compare_df = compare_df.set_index("label").loc[[current_pokemon] + [p for p in compare_pokemon if p != current_pokemon]].reset_index()
 
-    # Prepare figure
-    fig, ax = plt.subplots(figsize=(10, 0.6 * len(compare_df)))  # dynamic height
+    # Assign each Pokémon a unique color
+    import matplotlib.cm as cm
+    colors_map = cm.get_cmap("tab20", len(compare_df))  # 20 distinct colors
+    pokemon_colors = {label: colors_map(i) for i, label in enumerate(compare_df["label"])}
 
-    # --- Dark mode styling ---
-    fig.patch.set_facecolor("#000000")
-    ax.set_facecolor("#000000")
-    ax.tick_params(colors="white")
-    ax.xaxis.label.set_color("white")
-    ax.yaxis.label.set_color("white")
-    ax.title.set_color("white")
-
-    # Remove borders
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-
-    # Build grouped data (metrics grouped, Pokémon bars inside each metric)
-    total_bars = len(selected_metrics) * len(compare_df)
-    y_positions = []
-    labels = []
-    colors = []
-
-    # Generate bars: metric blocks one after another
-    position = 0
+    # Create a separate graph for each selected metric
     for metric in selected_metrics:
-        for i, row in compare_df.iterrows():
-            y_positions.append(position)
-            labels.append(f"{metric_display_names[metric]}: {row['label']}")
-            # Color by type_1
-            colors.append(TYPE_COLORS.get(row["type_1"], "#999999"))
-            position += 1
-        # Add gap between metric groups
-        position += 1
+        fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
 
-    # Plot bars
-    values = []
-    for metric in selected_metrics:
-        for i, row in compare_df.iterrows():
-            values.append(row[metric])
+        # --- Dark mode styling ---
+        fig.patch.set_facecolor("#000000")
+        ax.set_facecolor("#000000")
+        ax.tick_params(colors="white")
+        ax.xaxis.label.set_color("white")
+        ax.yaxis.label.set_color("white")
+        ax.title.set_color("white")
 
-    ax.barh(y_positions, values, color=colors)
+        # Remove borders
+        for spine in ax.spines.values():
+            spine.set_visible(False)
 
-    # Format axis
-    ax.set_yticks(y_positions)
-    ax.set_yticklabels(labels, color="white", fontsize=10)
-    ax.invert_yaxis()
-    ax.set_xlabel("Value")
-    ax.set_title("Pokémon Comparison (Grouped by Metric)")
-    ax.grid(False)
+        # Plot bars (horizontal)
+        ax.barh(
+            compare_df["label"],
+            compare_df[metric],
+            color=[pokemon_colors[label] for label in compare_df["label"]]
+        )
 
-    st.pyplot(fig)
+        # Format axis
+        ax.set_yticklabels(compare_df["label"], color="white", fontsize=10)
+        ax.invert_yaxis()
+        ax.set_xlabel(metric_display_names[metric])
+        ax.set_title(f"{metric_display_names[metric]} Comparison")
+        ax.grid(False)
+
+        # Show each chart
+        st.pyplot(fig)
