@@ -25,12 +25,16 @@ cd pokemon_stream
 2. **Set up virtual environment**
 ```bash
 python3 -m venv .venv
-# For Windows
+```
+- For Windows
+```bash
 source .venv/Scripts/activate
-# For MacOS/Linux
+```
+- For MacOS/Linux
+```bash
 source .venv/bin/activate
 ```
-3. **Install the dependencies**:
+1. **Install the dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
