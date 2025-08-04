@@ -141,7 +141,7 @@ st.markdown(
     <div style='text-align:center; font-size:18px;'>
         <b>Generation:</b> {pokemon_info['generation']} &nbsp;|&nbsp;
         <b>Height:</b> {pokemon_info['height_m']} m &nbsp;|&nbsp;
-        <b>Weight:</b> {pokemon_info['weight_kg']} kg &nbsp;   |&nbsp;
+        <b>Weight:</b> {pokemon_info['weight_kg']} kg &nbsp;|&nbsp;
         <b>Catch Rate:</b> {pokemon_info['catch_rate']} &nbsp;|&nbsp;
         <b>Growth Rate:</b> {pokemon_info['growth_rate']} &nbsp;|&nbsp;
         <b>Egg Type:</b> {egg_type}
@@ -153,11 +153,11 @@ st.markdown(
 #divider
 st.markdown("---")
 
-# Map against_* columns to type names
+# Map against_ columns to type names
 type_map = {col.replace("against_", "").capitalize(): val for col, val in pokemon_info.items() if col.startswith("against_")}
 
 # Strong = damage 2.0, Weak = damage < 1.0
-strong_types = [t for t, v in type_map.items() if v == 2.0]
+strong_types = [t for t, v in type_map.items() if v >= 2.0]
 weak_types = [t for t, v in type_map.items() if v < 1.0]
 
 def render_badges(types):
