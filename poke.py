@@ -242,6 +242,9 @@ if compare_pokemon:
 
         # Create a separate graph for each selected metric
         for metric in selected_metrics:
+            # Get max value for this metric from entire dataset (uniform scale)
+            max_value = df[metric].max()
+
             fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
 
             # --- Dark mode styling ---
@@ -264,6 +267,7 @@ if compare_pokemon:
             )
 
             # Format axis
+            ax.set_xlim(0, max_value)  # Uniform scale for all graphs
             ax.set_yticklabels(compare_df["label"], color="white", fontsize=10)
             ax.invert_yaxis()
             ax.set_xlabel(metric_display_names[metric])
