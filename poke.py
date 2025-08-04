@@ -24,7 +24,7 @@ TYPE_COLORS = {
     "Fairy": "#D685AD"
 }
 
-# Load Pokémon data
+# --- Load Pokémon data ---
 df = pd.read_csv("pokemon.csv")
 
 # Create label like "001 - Bulbasaur"
@@ -74,7 +74,7 @@ with next_col:
         st.session_state.current_pokemon = next_label
         st.rerun()
 
-# Image URL
+# --- Pokémon Image ---
 url = f"https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/{index_str}.png"
 
 # Get stats
@@ -101,7 +101,7 @@ with col1:
         else None
     )
 
-    # Badge rendering (single-line HTML to avoid escaping)
+    # Badge rendering
     def badge_html(type_name):
         color = TYPE_COLORS.get(type_name, "#999999")
         return f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{type_name}</span>'
@@ -114,7 +114,7 @@ with col1:
     st.markdown(f"<div style='text-align:center;margin-top:10px'>{badges}</div>", unsafe_allow_html=True)
 
 with col2:
-    # Single-color bars (primary type)
+    # Bar color (primary type)
     bar_color = TYPE_COLORS.get(type1, "#999999")
 
     fig, ax = plt.subplots(figsize=(9, 4))
@@ -126,3 +126,68 @@ with col2:
 
     ax.bar(stats_cols, percentages, width=0.95, color=bar_color)
     st.pyplot(fig)
+
+# ==========================
+# 1) FULL-WIDTH GENERAL INFO
+# ==========================
+st.markdown("---")
+general_info = df.loc[df["pokedex_number"] == index].iloc[0]
+
+egg_type = general_info["egg_type_1"]
+if not pd.isna(general_info["egg_type_2"]):
+    egg_type += f" / {general_info['egg_type_2']}"
+
+st.markdown(
+    f"""
+    <div style='text-align:center; font-size:18px;'>
+        <b>Generation:</b> {general_info['generation']} &nbsp;|&nbsp;
+        <b>Height:</b> {general_info['height_m']} m &nbsp;|&nbsp;
+        <b>Weight:</b> {general_info['weight_kg']} kg &nbsp;|&nbsp;
+        <b>Catch Rate:</b> {general_info['catch_rate']} &nbsp;|&nbsp;
+        <b>Growth Rate:</b> {general_info['growth_rate']} &nbsp;|&nbsp;
+        <b>Egg Type:</b> {egg_type}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# ================================
+# 2) STRONG AGAINST / WEAK AGAINST
+# ================================
+st.markdown("---")
+
+# Map against_* columns to type names
+type_map = {col.replace("against_", "").capitalize(): val for col, val in general_info.items() if col.startswith("against_")}
+
+# Strong = damage 2.0, Weak = damage < 1.0
+strong_types = [t for t, v in type_map.items() if v == 2.0]
+weak_types = [t for t, v in type_map.items() if v < 1.0]
+
+def render_badges(types):
+    badges = ""
+    for t in types:
+        color = TYPE_COLORS.get(t, "#999999")
+        badges += f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{t}</span>'
+    return badges if badges else "<i>None</i>"
+
+# Strong Against
+st.markdown(
+    f"""
+    <div style='text-align:center; margin-top:20px;'>
+        <h3 style='margin-bottom:10px;'>Strong Against</h3>
+        {render_badges(strong_types)}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# Weak Against
+st.markdown(
+    f"""
+    <div style='text-align:center; margin-top:20px;'>
+        <h3 style='margin-bottom:10px;'>Weak Against</h3>
+        {render_badges(weak_types)}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
