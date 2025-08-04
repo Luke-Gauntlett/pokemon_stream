@@ -2,112 +2,127 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load Pokémon dataset
+# --- Type colors for badges ---
+TYPE_COLORS = {
+    "Normal": "#A8A77A",
+    "Fire": "#EE8130",
+    "Water": "#6390F0",
+    "Electric": "#F7D02C",
+    "Grass": "#7AC74C",
+    "Ice": "#96D9D6",
+    "Fighting": "#C22E28",
+    "Poison": "#A33EA1",
+    "Ground": "#E2BF65",
+    "Flying": "#A98FF3",
+    "Psychic": "#F95587",
+    "Bug": "#A6B91A",
+    "Rock": "#B6A136",
+    "Ghost": "#735797",
+    "Dragon": "#6F35FC",
+    "Dark": "#705746",
+    "Steel": "#B7B7CE",
+    "Fairy": "#D685AD"
+}
+
+# Load Pokémon data
 df = pd.read_csv("pokemon.csv")
 
-# Sort by Pokédex number numerically
-df = df.sort_values("pokedex_number").reset_index(drop=True)
+# Create label like "001 - Bulbasaur"
+df["label"] = df["pokedex_number"].astype(str).str.zfill(3) + " - " + df["name"]
 
-# Create label without leading zeros
-df["label"] = df["pokedex_number"].astype(str) + " - " + df["name"]
+# Initialize session state
+if "current_pokemon" not in st.session_state:
+    st.session_state.current_pokemon = df["label"].iloc[0]
 
-# Search box
-search_input = st.text_input("Search Pokémon by name or number:")
-
-# Filter results
-if search_input:
-    if search_input.isdigit():
-        num = int(search_input)
-        # Exact match first
-        exact = df[df["pokedex_number"] == num]
-        # Then numbers starting with input
-        starts_with = df[
-            df["pokedex_number"].astype(str).str.startswith(search_input)
-            & (df["pokedex_number"] != num)
-        ]
-        # Then names containing input
-        name_matches = df[df["name"].str.contains(search_input, case=False, na=False)]
-        filtered_df = pd.concat([exact, starts_with, name_matches]).drop_duplicates(
-            subset=["pokedex_number", "name"]
-        )
-    else:
-        filtered_df = df[df["name"].str.contains(search_input, case=False, na=False)]
-else:
-    filtered_df = df
-
-# Style for results container
-st.markdown(
-    """
-    <style>
-    .result-item {
-        padding: 4px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
-    }
-    .result-item:hover {
-        background-color: #f0f0f0;
-    }
-    .results-box {
-        max-height: 250px;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
+# Dropdown selector
+selected = st.selectbox(
+    "Search Pokémon by number or name:",
+    df["label"],
+    index=int(df[df["label"] == st.session_state.current_pokemon].index[0])
 )
 
-selected_pokemon = None
+# Update current Pokémon
+st.session_state.current_pokemon = selected
 
-# Display filtered results as clickable list
-st.markdown('<div class="results-box">', unsafe_allow_html=True)
-for _, row in filtered_df.iterrows():
-    label = f"{row['pokedex_number']} - {row['name']}"
-    if st.button(label, key=f"{row['pokedex_number']}-{row['name']}"):
-        selected_pokemon = row
-st.markdown('</div>', unsafe_allow_html=True)
+# Extract number and name
+index_str, pokemon_name = selected.split(" - ")
+index = int(index_str)
 
-# Show Pokémon details when selected
-if selected_pokemon is not None:
-    index = selected_pokemon["pokedex_number"]
-    pokemon_name = selected_pokemon["name"]
+# Styling for centered title
+st.markdown("""<style> h1 {text-align: center;} </style>""", unsafe_allow_html=True)
 
-    # Image URL (zero-padded for official images)
-    image_index_str = str(index).zfill(3)
-    url = f"https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/{image_index_str}.png"
+# Layout: Previous button | Title | Next button
+prev_col, title_col, next_col = st.columns([2, 6, 2])
 
-    # Stats
-    stats_cols = ["hp", "attack", "defense", "sp_attack", "sp_defense", "speed"]
-    pokemon_stats = df.loc[
-        (df["pokedex_number"] == index) & (df["name"] == pokemon_name),
-        stats_cols
-    ].iloc[0]
+# Previous button
+with prev_col:
+    if st.button("Previous"):
+        prev_index = (index - 2) % df["pokedex_number"].max() + 1
+        prev_label = df.loc[df["pokedex_number"] == prev_index, "label"].values[0]
+        st.session_state.current_pokemon = prev_label
+        st.rerun()
 
-    # Normalize stats
-    min_stats = df[stats_cols].min()
-    max_stats = df[stats_cols].max()
-    normalized_stats = ((pokemon_stats - min_stats) / (max_stats - min_stats)) * 100
+# Title
+with title_col:
+    st.title(selected)
 
-    # Centered title
-    st.markdown(f"<h1 style='text-align: center;'>{index} - {pokemon_name}</h1>", unsafe_allow_html=True)
+# Next button
+with next_col:
+    if st.button("Next"):
+        next_index = (index % df["pokedex_number"].max()) + 1
+        next_label = df.loc[df["pokedex_number"] == next_index, "label"].values[0]
+        st.session_state.current_pokemon = next_label
+        st.rerun()
 
-    # Layout: image and graph
-    col1, col2 = st.columns([1, 2])
+# Image URL
+url = f"https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/{index_str}.png"
 
-    with col1:
-        st.image(url, caption=f"{index} - {pokemon_name}", width=200)
+# Get stats
+stats_cols = ["hp", "attack", "defense", "sp_attack", "sp_defense", "speed"]
+pokemon_stats = df.loc[df["pokedex_number"] == index, stats_cols].iloc[0]
 
-    with col2:
-        fig, ax = plt.subplots(figsize=(6, 3))
-        ax.bar(stats_cols, normalized_stats, width=0.4)
-        ax.set_ylim(0, 100)
-        ax.set_ylabel("Stat % (Min–Max)")
-        ax.set_title(f"{pokemon_name} Attack Stats")
-        ax.margins(x=0.02)
+# Normalize stats to percentages
+min_stats = df[stats_cols].min()
+max_stats = df[stats_cols].max()
+percentages = ((pokemon_stats - min_stats) / (max_stats - min_stats)) * 100
 
-        for i, val in enumerate(normalized_stats):
-            ax.text(i, val + 2, f"{val:.0f}%", ha="center")
+# Layout for image + stats
+col1, col2 = st.columns([1, 2])
 
-        st.pyplot(fig)
+with col1:
+    # Pokémon image
+    st.image(url, width=220)
+
+    # Get Pokémon types
+    type1 = df.loc[df["pokedex_number"] == index, "type_1"].values[0]
+    type2 = (
+        df.loc[df["pokedex_number"] == index, "type_2"].values[0]
+        if "type_2" in df.columns and not pd.isna(df.loc[df["pokedex_number"] == index, "type_2"].values[0])
+        else None
+    )
+
+    # Badge rendering (single-line HTML to avoid escaping)
+    def badge_html(type_name):
+        color = TYPE_COLORS.get(type_name, "#999999")
+        return f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{type_name}</span>'
+
+    badges = badge_html(type1)
+    if type2:
+        badges += badge_html(type2)
+
+    # Center badges under image
+    st.markdown(f"<div style='text-align:center;margin-top:10px'>{badges}</div>", unsafe_allow_html=True)
+
+with col2:
+    # Single-color bars (primary type)
+    bar_color = TYPE_COLORS.get(type1, "#999999")
+
+    fig, ax = plt.subplots(figsize=(9, 4))
+    fig.patch.set_facecolor("#000000")
+    ax.set_facecolor("#0e0000")
+    ax.set_ylim(0, 100)
+    ax.set_title("Stats", color="white", fontsize=20, pad=30)
+    ax.tick_params(axis='x', colors='white')
+
+    ax.bar(stats_cols, percentages, width=0.95, color=bar_color)
+    st.pyplot(fig)
