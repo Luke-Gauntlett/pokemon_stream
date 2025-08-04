@@ -205,6 +205,10 @@ compare_pokemon = st.multiselect(
     df["label"]
 )
 
+# Always include the currently selected Pokémon from the top
+if st.session_state.current_pokemon not in compare_pokemon:
+    compare_pokemon = [st.session_state.current_pokemon] + compare_pokemon
+
 # Checkboxes for metrics
 metrics = ["height_m", "weight_kg", "hp", "attack"]
 metric_display_names = {
