@@ -16,6 +16,7 @@ df['new_pokedex'] = df.apply(
 
 df['Pokemon'] = df.apply(lambda row: f"{row['pokedex_number']:03d} - {row['name']}", axis=1)
 
+
 def get_pokemon_image_url(index):
     # Format index as a 3-digit string (e.g., 001, 025, 150)
     index_str = str(index).zfill(3)
