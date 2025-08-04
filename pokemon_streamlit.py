@@ -62,12 +62,14 @@ img_url = (
 st.image(img_url, caption=selected_label, use_container_width=True)
 
 # Display basic info
-info_cols = [
-    'name', 'height_m', 'weight_kg', 'type_1',
-    'ability_1', 'ability_2', 'ability_hidden'
-]
+select_columns = st.multiselect("What Attributes Would you like to see: ",
+options=df.columns.tolist(),
+default=['name','height_m','weight_kg','type_1', 'ability_1', 'ability_2', 'ability_hidden']
+)
+
+user_result = df.loc[df['Pokemon'] == selected_label, select_columns]
 st.subheader("Pokémon Info")
-st.dataframe(df.loc[df['Pokemon'] == selected_label, info_cols])
+st.dataframe(user_result)
 
 # Display stats chart
 stats_cols = ["hp", "attack", "defense", "sp_attack", "sp_defense", "speed"]
