@@ -171,7 +171,7 @@ def render_badges(types):
 st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
-        <h3 style='margin-bottom:10px;'>Strong Against</h3>
+        <h3 style='margin-bottom:10px;'>Weak Against</h3>
         {render_badges(strong_types)}
     </div>
     """,
@@ -182,7 +182,7 @@ st.markdown(
 st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
-        <h3 style='margin-bottom:10px;'>Weak Against</h3>
+        <h3 style='margin-bottom:10px;'>Strong Against</h3>
         {render_badges(weak_types)}
     </div>
     """,
