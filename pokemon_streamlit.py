@@ -61,6 +61,9 @@ img_url = (
 # Display image
 st.image(img_url, caption=selected_label, use_container_width=True)
 
+# Divider
+st.markdown("---")
+
 # Display basic info
 select_columns = st.multiselect("What Attributes Would You Like To See? ",
 options=df.columns.tolist(),
@@ -91,6 +94,9 @@ for i, val in enumerate(normalized_stats):
     ax.text(i, val + 2, f"{val:.0f}%", ha="center")
 
 st.pyplot(fig)
+
+# Divider
+st.markdown("---")
 
 st.subheader("Pokémon Comparisons")
 # Get the name for the selected Pokémon
