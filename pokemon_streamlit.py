@@ -5,7 +5,7 @@ import plotly.express as px
 
 
 # Title
-st.title("Find Your Pokémon")
+st.title("Find Your Pokémon!")
 
 # Load and clean data
 df = pd.read_csv("pokemon.csv")
