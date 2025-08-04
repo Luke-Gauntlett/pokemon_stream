@@ -4,7 +4,7 @@ import plotly.express as px
 
 
 # Set the app title
-st.title("Pokemon Streamlit Challenge")
+st.title("Pokemon Comparisons")
 # Load the Pokemon dataset
 df = pd.read_csv("./pokemon.csv")
 # # Test
@@ -12,7 +12,7 @@ df = pd.read_csv("./pokemon.csv")
 
 # Get user input
 pokedex_number = st.number_input(
-                            "Enter a Pokedex number (e.g., 6 for Charizard),",
+                            "Enter a Pokedex number (e.g., 6 for Charizard):",
                             min_value=1,
                             step=1
                             )
@@ -20,6 +20,7 @@ pokedex_number = st.number_input(
 # Filter to get the selected pokemon
 matching_pokemon = df[df['pokedex_number'] == pokedex_number]
 
+# This is done to make sure the code does not run when the pokedex is invalid
 selected_pokemon = None
 
 # Write an error is Pokemon isn't found
