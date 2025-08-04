@@ -1,6 +1,6 @@
-# Find your Pokémon: A Streamlit Pokemon Application
+# Find your Pokémon!: A Streamlit Pokemon Application
 
-Welcome to **Find Your Pokémon**, a Streamlit-powered app that lets you compare any Pokémon to others based on **Height**, **Weight**, **HP**, or **Attack**. Whether you're figuring out who's the tallest, tankiest, or strongest in the gym, we've got you covered.
+Welcome to **Find Your Pokémon**, a Streamlit-powered app that lets you compare any Pokémon to others based on **Height**, **Weight**, **HP**, **Attack**, etc. Whether you're figuring out who's the tallest, tankiest, or strongest in the gym, we've got you covered.
 
 ---
 
@@ -22,11 +22,19 @@ Welcome to **Find Your Pokémon**, a Streamlit-powered app that lets you compare
 git clone https://github.com/Luke-Gauntlett/pokemon_stream.git
 cd pokemon_stream
 ```
-2. **Install the dependencies**:
+2. **Set up virtual environment
+```bash
+python3 -m venv .venv
+# For Windows
+source .venv/Scripts/activate
+# For MacOS/Linux
+source .venv/bin/activate
+```
+3. **Install the dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
-3. **Run the Streamlit app**:
+1. **Run the Streamlit app**:
 ```bash
 streamlit run pokemon_streamlit.py
 ```
