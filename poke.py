@@ -163,7 +163,7 @@ weak_types = [t for t, v in type_map.items() if v < 1]
 def render_badges(types):
     badges = ""
     for type in types:
-        color = TYPE_COLORS.get(t, "#999999")
+        color = TYPE_COLORS.get(types, "#999999")
         badges += f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{type}</span>'
     return badges if badges else "<i>None</i>"
 
