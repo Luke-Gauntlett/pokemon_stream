@@ -260,11 +260,24 @@ if compare_pokemon:
                 spine.set_visible(False)
 
             # Plot bars (horizontal)
-            ax.barh(
+            bars = ax.barh(
                 compare_df["label"],
                 compare_df[metric],
                 color=[pokemon_colors[label] for label in compare_df["label"]]
             )
+
+            # Add labels inside bars
+            for bar, value in zip(bars, compare_df[metric]):
+                ax.text(
+                    bar.get_width() - (0.05 * max_value),  # slightly inset from bar end
+                    bar.get_y() + bar.get_height() / 2,
+                    f"{value}",
+                    va="center",
+                    ha="right",
+                    color="white",
+                    fontsize=10,
+                    fontweight="bold"
+                )
 
             # Format axis
             ax.set_xlim(0, max_value)  # Uniform scale for all graphs
