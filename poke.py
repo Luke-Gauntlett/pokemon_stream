@@ -268,16 +268,30 @@ if compare_pokemon:
 
             # Add labels inside bars
             for bar, value in zip(bars, compare_df[metric]):
-                ax.text(
-                    bar.get_width() - (0.05 * max_value),  # slightly inset from bar end
-                    bar.get_y() + bar.get_height() / 2,
-                    f"{value}",
-                    va="center",
-                    ha="right",
-                    color="white",
-                    fontsize=10,
-                    fontweight="bold"
-                )
+                if value > max_value * 0.15:  # if bar is long enough
+                    # Place label inside bar
+                    ax.text(
+                        bar.get_width() - (0.02 * max_value),  # slight padding from bar end
+                        bar.get_y() + bar.get_height() / 2,
+                        f"{value}",
+                        va="center",
+                        ha="right",
+                        color="white",
+                        fontsize=10,
+                        fontweight="bold"
+                    )
+                else:
+                    # Place label outside bar
+                    ax.text(
+                        bar.get_width() + (0.02 * max_value),  # just outside the bar
+                        bar.get_y() + bar.get_height() / 2,
+                        f"{value}",
+                        va="center",
+                        ha="left",
+                        color="white",
+                        fontsize=10,
+                        fontweight="bold"
+                    )
 
             # Format axis
             ax.set_xlim(0, max_value)  # Uniform scale for all graphs
