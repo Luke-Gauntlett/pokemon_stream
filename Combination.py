@@ -10,8 +10,8 @@ st.title("Find Your Pokémon")
 df = pd.read_csv("pokemon.csv")
 df = df.iloc[:, :24]
 df = df.drop(columns=['german_name', 'japanese_name', 'type_number', 'type_2'], errors='ignore')
-df = df.rename(columns={'Unnamed: 0': 'csv_index'})
-df = df.set_index('csv_index')
+df = df.rename(columns={'Unnamed: 0': '_'})
+df = df.set_index('_')
 
 # Handle duplicates
 df['dup_count'] = df.groupby('pokedex_number').cumcount()
@@ -52,44 +52,68 @@ min_stats = df[stats_cols].min()
 max_stats = df[stats_cols].max()
 normalized_stats = ((pokemon_stats - min_stats) / (max_stats - min_stats)) * 100
 
-col1, col2 = st.columns([1, 2])
-with col1:
-    st.image(img_url, caption=selected_label, width=200)
+# Display stats chart only
+fig, ax = plt.subplots(figsize=(6, 3))
+ax.bar(stats_cols, normalized_stats, width=0.4)
+ax.set_ylim(0, 100)
+ax.set_ylabel("Stat % (Min–Max)")
+ax.set_title(f"{selected_name} Attack Stats")
 
-with col2:
-    fig, ax = plt.subplots(figsize=(6, 3))
-    ax.bar(stats_cols, normalized_stats, width=0.4)
-    ax.set_ylim(0, 100)
-    ax.set_ylabel("Stat % (Min–Max)")
-    ax.set_title(f"{selected_name} Attack Stats")
-    for i, val in enumerate(normalized_stats):
-        ax.text(i, val + 2, f"{val:.0f}%", ha="center")
-    st.pyplot(fig)
+for i, val in enumerate(normalized_stats):
+    ax.text(i, val + 2, f"{val:.0f}%", ha="center")
 
-# Weight comparison chart
-main_pokemon_df = pd.DataFrame([{
-    "name": selected_name,
-    "weight_kg": selected_row['weight_kg']
-}])
+st.pyplot(fig)
 
-df_cleaned = df.dropna(subset=['name', 'weight_kg'])
-randomly_selected_df = df_cleaned[['name', 'weight_kg']].sample(n=5, random_state=5)
 
-combined_df = pd.concat([main_pokemon_df, randomly_selected_df], ignore_index=True)
+# Get the name for the selected Pokémon
+main_pokemon_name = selected_name.strip()
+
+# Choose a comparison metric
+comparison_metric = st.selectbox(
+    "Select metric to compare:",
+    ["height_m", "weight_kg", "hp", "attack"]
+)
+
+# Get a random selection of other Pokémon (excluding the selected one)
+num_selection = 5
+randomly_selected_df = df[df['name'] != main_pokemon_name].dropna(
+    subset=[comparison_metric]
+).sample(n=num_selection, random_state=5)
+
+# Convert selected_row to DataFrame
+selected_pokemon_df = pd.DataFrame([selected_row])
+
+# Combine both DataFrames
+combined_df = pd.concat([selected_pokemon_df, randomly_selected_df], ignore_index=True)
+
+# Store the order of the Pokémon names
 name_order = combined_df['name'].tolist()
-combined_df['weight_text'] = combined_df['weight_kg'].astype(str) + 'kg'
 
-fig = px.bar(combined_df,
-             x='weight_kg',
-             y='name',
-             title=f"Comparison of {selected_name}'s Weight to Other Pokémon",
-             labels={'name': 'Pokémon Name', 'weight_kg': 'Weight (kg)'},
-             text='weight_text',
-             orientation='h',
-             color='name')
+# Format the metric text
+suffix = {
+    "height_m": "m",
+    "weight_kg": "kg",
+    "hp": " HP",
+    "attack": " ATK"
+}[comparison_metric]
+
+combined_df['metric_text'] = combined_df[comparison_metric].astype(str) + suffix
+
+# Plot the graph
+fig = px.bar(
+    combined_df,
+    x=comparison_metric,
+    y='name',
+    title=f"Comparison of {main_pokemon_name} to Other Pokémon by {comparison_metric.capitalize()}",
+    labels={'name': 'Pokémon Name', comparison_metric: comparison_metric.capitalize()},
+    text='metric_text',
+    orientation='h',
+    color='name'
+)
 
 fig.update_layout(
     yaxis=dict(categoryorder='array', categoryarray=name_order[::-1]),
     showlegend=False
 )
+
 st.plotly_chart(fig)
