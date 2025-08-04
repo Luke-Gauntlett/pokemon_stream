@@ -206,8 +206,9 @@ compare_pokemon = st.multiselect(
 )
 
 # Always include the currently selected Pokémon from the top
-if st.session_state.current_pokemon not in compare_pokemon:
-    compare_pokemon = [st.session_state.current_pokemon] + compare_pokemon
+current_pokemon = st.session_state.current_pokemon
+if current_pokemon not in compare_pokemon:
+    compare_pokemon = [current_pokemon] + compare_pokemon
 
 # Checkboxes for metrics
 metrics = ["height_m", "weight_kg", "hp", "attack"]
@@ -228,6 +229,9 @@ for i, metric in enumerate(metrics):
 # Show comparison chart
 if compare_pokemon and selected_metrics:
     compare_df = df[df["label"].isin(compare_pokemon)][["label"] + selected_metrics]
+
+    # Ensure the current Pokémon always appears first
+    compare_df = compare_df.set_index("label").loc[[current_pokemon] + [p for p in compare_pokemon if p != current_pokemon]].reset_index()
 
     # Create horizontal grouped bar chart
     fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
