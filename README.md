@@ -34,11 +34,11 @@ source .venv/Scripts/activate
 ```bash
 source .venv/bin/activate
 ```
-1. **Install the dependencies**:
+4. **Install the dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
-1. **Run the Streamlit app**:
+5. **Run the Streamlit app**:
 ```bash
 streamlit run pokemon_streamlit.py
 ```
