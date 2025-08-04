@@ -30,5 +30,5 @@ image_index = df.loc[df['Pokemon'] == selected, 'new_pokedex'].values[0]
 
 img_url = f"https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/{image_index}.png"
 
-st.image(img_url, caption=f"{selected}", use_column_width=True)
+st.image(img_url, caption=f"{selected}", use_container_width=True)
 
