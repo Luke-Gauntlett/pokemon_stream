@@ -62,7 +62,7 @@ img_url = (
 st.image(img_url, caption=selected_label, use_container_width=True)
 
 # Display basic info
-select_columns = st.multiselect("What Attributes Would You Like To See?: ",
+select_columns = st.multiselect("What Attributes Would You Like To See? ",
 options=df.columns.tolist(),
 default=['name','height_m','weight_kg','type_1', 'ability_1', 'ability_2', 'ability_hidden']
 )
