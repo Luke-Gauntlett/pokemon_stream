@@ -188,3 +188,61 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+
+
+
+
+###################### experimental ########################################################
+
+# --- Comparison Section ---
+st.markdown("---")
+st.header("Compare Pokémon")
+
+# Multiselect for Pokémon (unlimited)
+compare_pokemon = st.multiselect(
+    "Select Pokémon to compare:",
+    df["label"]
+)
+
+# Checkboxes for metrics
+metrics = ["height_m", "weight_kg", "hp", "attack"]
+metric_display_names = {
+    "height_m": "Height (m)",
+    "weight_kg": "Weight (kg)",
+    "hp": "HP",
+    "attack": "Attack"
+}
+
+# Show checkboxes
+selected_metrics = []
+cols = st.columns(4)  # One checkbox per metric
+for i, metric in enumerate(metrics):
+    if cols[i].checkbox(metric_display_names[metric], value=(metric in ["hp", "attack"])):
+        selected_metrics.append(metric)
+
+# Show comparison chart
+if compare_pokemon and selected_metrics:
+    compare_df = df[df["label"].isin(compare_pokemon)][["label"] + selected_metrics]
+
+    # Create horizontal grouped bar chart
+    fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
+    y = range(len(compare_df))
+    bar_height = 0.8 / len(selected_metrics)  # distribute bars evenly
+
+    for i, metric in enumerate(selected_metrics):
+        ax.barh(
+            [p + i * bar_height for p in y],
+            compare_df[metric],
+            height=bar_height,
+            label=metric_display_names[metric]
+        )
+
+    ax.set_yticks([p + bar_height * (len(selected_metrics) / 2) for p in y])
+    ax.set_yticklabels(compare_df["label"])
+    ax.invert_yaxis()  # Highest value at top
+    ax.set_xlabel("Value")
+    ax.set_title("Pokémon Comparison")
+    ax.legend()
+
+    st.pyplot(fig)
