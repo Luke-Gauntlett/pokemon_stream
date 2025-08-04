@@ -56,14 +56,8 @@ matching_pokemon = df[df['name'] == pokemon_name]
 # Store the details of the matched pokemon in a series
 selected_pokemon = matching_pokemon.iloc[0]
 
-# Get the name and height for the pokemon and store in a new DataFrame
+# Get the name for the selected pokemon
 main_pokemon_name = selected_pokemon['name'].strip()
-# main_pokemon_weight = selected_pokemon['weight_kg']
-# main_pokemon_dict = {
-#     "name": main_pokemon_name,
-#     "weight_kg": main_pokemon_weight
-# }
-# main_pokemon_df = pd.DataFrame([main_pokemon_dict])
 
 # Choose a comparison metric
 comparison_metric = st.selectbox(
@@ -72,12 +66,6 @@ comparison_metric = st.selectbox(
 )
 
 # Get a random selection of other pokemon and store in a new DataFrame
-# name_col = "name"
-# weight_col = "weight_kg"
-
-# # Drop any columns with missing name and height
-# df_cleaned = df.dropna(subset=[name_col, weight_col])
-
 # Set the number of randomly selected pokemon
 num_selection = 5
 
@@ -111,7 +99,6 @@ suffix = {
 combined_df['metric_text'] = (
     combined_df[comparison_metric].astype(str) + suffix
 )
-st.write(combined_df)
 
 # Plot the graph
 fig = px.bar(combined_df,
