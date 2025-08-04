@@ -163,7 +163,7 @@ weak_types = [t for t, v in type_map.items() if v < 1]
 def render_badges(types):
     badges = ""
     for type in types:
-        color = TYPE_COLORS.get(types, "#999999")
+        color = TYPE_COLORS.get(type, "#999999")
         badges += f'<span style="display:inline-block;background-color:{color};color:white;font-weight:bold;padding:5px 12px;border-radius:12px;margin:0 5px;font-size:16px;">{type}</span>'
     return badges if badges else "<i>None</i>"
 
@@ -172,7 +172,7 @@ st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
         <h3 style='margin-bottom:10px;'>Strong Against</h3>
-        {render_badges(weak_types)}
+        {render_badges(strong_types)}
     </div>
     """,
     unsafe_allow_html=True
@@ -183,8 +183,9 @@ st.markdown(
     f"""
     <div style='text-align:center; margin-top:20px;'>
         <h3 style='margin-bottom:10px;'>Weak Against</h3>
-        {render_badges(strong_types)}
+        {render_badges(weak_types)}
     </div>
     """,
     unsafe_allow_html=True
+)
 )
