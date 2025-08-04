@@ -195,7 +195,38 @@ st.markdown(
 
 ###################### experimental ########################################################
 
-# Show comparison chart
+# --- Comparison Section ---
+st.markdown("---")
+st.header("Compare Pokémon")
+
+# Multiselect for Pokémon (unlimited)
+compare_pokemon = st.multiselect(
+    "Select Pokémon to compare:",
+    df["label"]
+)
+
+# Always include the currently selected Pokémon from the top
+current_pokemon = st.session_state.current_pokemon
+if current_pokemon not in compare_pokemon:
+    compare_pokemon = [current_pokemon] + compare_pokemon
+
+# Checkboxes for metrics
+metrics = ["height_m", "weight_kg", "hp", "attack"]
+metric_display_names = {
+    "height_m": "Height (m)",
+    "weight_kg": "Weight (kg)",
+    "hp": "HP",
+    "attack": "Attack"
+}
+
+# Show checkboxes
+selected_metrics = []
+cols = st.columns(4)  # One checkbox per metric
+for i, metric in enumerate(metrics):
+    if cols[i].checkbox(metric_display_names[metric], value=(metric in ["hp", "attack"])):
+        selected_metrics.append(metric)
+
+# --- Ensure variables are defined before plotting ---
 if compare_pokemon and selected_metrics:
     compare_df = df[df["label"].isin(compare_pokemon)][["label", "type_1"] + selected_metrics]
 
