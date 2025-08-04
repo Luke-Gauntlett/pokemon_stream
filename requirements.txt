@@ -16,7 +16,6 @@ Jinja2==3.1.6
 jsonschema==4.25.0
 jsonschema-specifications==2025.4.1
 kiwisolver==1.4.8
-matplotlib==3.8.0
 MarkupSafe==3.0.2
 matplotlib==3.10.5
 narwhals==1.35.0
