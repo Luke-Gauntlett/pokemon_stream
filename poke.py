@@ -195,76 +195,60 @@ st.markdown(
 
 ###################### experimental ########################################################
 
-# --- Comparison Section ---
-st.markdown("---")
-st.header("Compare Pokémon")
-
-# Multiselect for Pokémon (unlimited)
-compare_pokemon = st.multiselect(
-    "Select Pokémon to compare:",
-    df["label"]
-)
-
-# Always include the currently selected Pokémon from the top
-current_pokemon = st.session_state.current_pokemon
-if current_pokemon not in compare_pokemon:
-    compare_pokemon = [current_pokemon] + compare_pokemon
-
-# Checkboxes for metrics
-metrics = ["height_m", "weight_kg", "hp", "attack"]
-metric_display_names = {
-    "height_m": "Height (m)",
-    "weight_kg": "Weight (kg)",
-    "hp": "HP",
-    "attack": "Attack"
-}
-
-# Show checkboxes
-selected_metrics = []
-cols = st.columns(4)  # One checkbox per metric
-for i, metric in enumerate(metrics):
-    if cols[i].checkbox(metric_display_names[metric], value=(metric in ["hp", "attack"])):
-        selected_metrics.append(metric)
-
 # Show comparison chart
 if compare_pokemon and selected_metrics:
-    compare_df = df[df["label"].isin(compare_pokemon)][["label"] + selected_metrics]
+    compare_df = df[df["label"].isin(compare_pokemon)][["label", "type_1"] + selected_metrics]
 
     # Ensure the current Pokémon always appears first
     compare_df = compare_df.set_index("label").loc[[current_pokemon] + [p for p in compare_pokemon if p != current_pokemon]].reset_index()
 
-    # Create horizontal grouped bar chart
-    fig, ax = plt.subplots(figsize=(10, 0.5 * len(compare_df)))  # Dynamic height
+    # Prepare figure
+    fig, ax = plt.subplots(figsize=(10, 0.6 * len(compare_df)))  # dynamic height
 
     # --- Dark mode styling ---
-    fig.patch.set_facecolor("#000000")     # Entire figure background
-    ax.set_facecolor("#000000")            # Plot area background
-    ax.tick_params(colors="white")         # Tick color
-    ax.xaxis.label.set_color("white")      # X-axis label
-    ax.yaxis.label.set_color("white")      # Y-axis label
-    ax.title.set_color("white")            # Title color
+    fig.patch.set_facecolor("#000000")
+    ax.set_facecolor("#000000")
+    ax.tick_params(colors="white")
+    ax.xaxis.label.set_color("white")
+    ax.yaxis.label.set_color("white")
+    ax.title.set_color("white")
 
-    # Remove borders/spines
+    # Remove borders
     for spine in ax.spines.values():
         spine.set_visible(False)
 
-    # Plot bars
-    y = range(len(compare_df))
-    bar_height = 0.8 / len(selected_metrics)  # distribute bars evenly
-    for i, metric in enumerate(selected_metrics):
-        ax.barh(
-            [p + i * bar_height for p in y],
-            compare_df[metric],
-            height=bar_height,
-            label=metric_display_names[metric]
-        )
+    # Build grouped data (metrics grouped, Pokémon bars inside each metric)
+    total_bars = len(selected_metrics) * len(compare_df)
+    y_positions = []
+    labels = []
+    colors = []
 
-    # Set labels and formatting
-    ax.set_yticks([p + bar_height * (len(selected_metrics) / 2) for p in y])
-    ax.set_yticklabels(compare_df["label"], color="white")
-    ax.invert_yaxis()  # Highest value at top
+    # Generate bars: metric blocks one after another
+    position = 0
+    for metric in selected_metrics:
+        for i, row in compare_df.iterrows():
+            y_positions.append(position)
+            labels.append(f"{metric_display_names[metric]}: {row['label']}")
+            # Color by type_1
+            colors.append(TYPE_COLORS.get(row["type_1"], "#999999"))
+            position += 1
+        # Add gap between metric groups
+        position += 1
+
+    # Plot bars
+    values = []
+    for metric in selected_metrics:
+        for i, row in compare_df.iterrows():
+            values.append(row[metric])
+
+    ax.barh(y_positions, values, color=colors)
+
+    # Format axis
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(labels, color="white", fontsize=10)
+    ax.invert_yaxis()
     ax.set_xlabel("Value")
-    ax.set_title("Pokémon Comparison")
-    ax.legend(facecolor="#000000", edgecolor="none", labelcolor="white")
+    ax.set_title("Pokémon Comparison (Grouped by Metric)")
+    ax.grid(False)
 
     st.pyplot(fig)
