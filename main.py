@@ -56,55 +56,76 @@ matching_pokemon = df[df['name'] == pokemon_name]
 # Store the details of the matched pokemon in a series
 selected_pokemon = matching_pokemon.iloc[0]
 
-
 # Get the name and height for the pokemon and store in a new DataFrame
 main_pokemon_name = selected_pokemon['name'].strip()
-main_pokemon_weight = selected_pokemon['weight_kg']
-main_pokemon_dict = {
-    "name": main_pokemon_name,
-    "weight_kg": main_pokemon_weight
-}
-main_pokemon_df = pd.DataFrame([main_pokemon_dict])
+# main_pokemon_weight = selected_pokemon['weight_kg']
+# main_pokemon_dict = {
+#     "name": main_pokemon_name,
+#     "weight_kg": main_pokemon_weight
+# }
+# main_pokemon_df = pd.DataFrame([main_pokemon_dict])
+
+# Choose a comparison metric
+comparison_metric = st.selectbox(
+    "Select metric to compare:",
+    ["height_m", "weight_kg", "hp", "attack"]
+)
 
 # Get a random selection of other pokemon and store in a new DataFrame
-name_col = "name"
-weight_col = "weight_kg"
+# name_col = "name"
+# weight_col = "weight_kg"
 
-# Drop any columns with missing name and height
-df_cleaned = df.dropna(subset=[name_col, weight_col])
+# # Drop any columns with missing name and height
+# df_cleaned = df.dropna(subset=[name_col, weight_col])
 
 # Set the number of randomly selected pokemon
 num_selection = 5
 
 # Select the pokemon from the dataframe
-randomly_selected_df = df_cleaned[[name_col, weight_col]].sample(
-                                                    n=num_selection,
-                                                    random_state=5
-                                                )
+randomly_selected_df = df[
+    df['name'] != main_pokemon_name
+].sample(
+    n=num_selection,
+    random_state=5
+)
 
 # Combine both dataframes
+# Convert the selected_pokemon series to a DataFrame
+selected_pokemon_df = pd.DataFrame([selected_pokemon])
 combined_df = pd.concat([
-                    main_pokemon_df,
+                    selected_pokemon_df,
                     randomly_selected_df],
                     ignore_index=True)
+
+# Store the order of the pokemon names in a list
 name_order = combined_df['name'].tolist()
 
-# Create a new column to format height text
-combined_df['weight_text'] = combined_df['weight_kg'].astype(str) + 'kg'
+# Format the text for every metric
+suffix = {
+            "height_m": "m",
+            "weight_kg": "kg",
+            "hp": " HP",
+            "attack": " ATK"
+        }[comparison_metric]
+
+combined_df['metric_text'] = (
+    combined_df[comparison_metric].astype(str) + suffix
+)
+st.write(combined_df)
 
 # Plot the graph
 fig = px.bar(combined_df,
-             x='weight_kg',
+             x=comparison_metric,
              y='name',
              title=(
-                    f"Comparison of {main_pokemon_name}'s Weight "
-                    "to Other Pokemon"
+                    f"Comparison of {main_pokemon_name}"
+                    f"to Other Pokemon by {comparison_metric.capitalize()}"
                 ),
              labels={
                         'name': 'Pokemon Name',
-                        'weight_kg': 'Pokemon Weight (kg)'
+                        comparison_metric: comparison_metric.capitalize()
                     },
-             text='weight_text',
+             text='metric_text',
              orientation='h',
              color='name'
              )
