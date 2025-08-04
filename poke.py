@@ -154,7 +154,7 @@ st.markdown(
 st.markdown("---")
 
 # Map against_* columns to type names
-type_map = {col.replace("against_", "").capitalize(): val for col, val in general_info.items() if col.startswith("against_")}
+type_map = {col.replace("against_", "").capitalize(): val for col, val in pokemon_info.items() if col.startswith("against_")}
 
 # Strong = damage 2.0, Weak = damage < 1.0
 strong_types = [t for t, v in type_map.items() if v == 2.0]
